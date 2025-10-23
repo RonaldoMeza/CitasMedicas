@@ -11,7 +11,7 @@ Planificar y diseñar **MediTurn**, una app móvil para la **gestión de citas m
 ## 👥 Roles
 
 - **Líder técnico:** Ronaldo Meza Pastrana  
-- **Diseñador UI:** Yordy Pillaca Ramos  
+- **Diseñador UI:** Yordy Aldair Pillaca Ramos  
 - **Tester / Documentador:** Yordy Pillaca & Ronaldo Meza  
 
 ---
@@ -49,4 +49,4 @@ Pacientes que deseen **gestionar sus citas médicas desde su teléfono Android**
 El prototipo fue diseñado en **Figma Make**, incluye un flujo completo entre pantallas conectadas.
 
 **Enlace del prototipo Figma:**  
-👉 [Ver prototipo en Figma](https://www.figma.com/make/FH36eujiFfqT1cngOcDgnj/MediTurn-Medical-App-Prototype?node-id=0-1&p=f&t=NDYuCPW8eOqsaMPs-0)
+👉 [Ver prototipo en Figma](https://film-gas-02646982.figma.site/)
