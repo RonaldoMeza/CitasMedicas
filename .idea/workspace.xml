@@ -5,15 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7de56b19-a477-4903-b8ca-18cabf10ebdb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Appointment.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Doctor.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Patient.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Slot.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/navigation/AppNavigation.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/navigation/Routes.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/search/test" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/util/Constans.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/util/Extensions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,11 +65,15 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "F:/Program_Languages/Kotlin/AndroidStudio/CitasMedicas/app/src/main/java/com/citasmedicas/ui/screens/profile"
+    "git-widget-placeholder": "ronaldo",
+    "last_opened_file_path": "F:/Program_Languages/Kotlin/AndroidStudio/CitasMedicas/app/src/main/java/com/citasmedicas/ui/screens/profile",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.17",
+    "project.structure.side.proportion": "0.2"
   }
 }]]></component>
   <component name="RecentsManager">
