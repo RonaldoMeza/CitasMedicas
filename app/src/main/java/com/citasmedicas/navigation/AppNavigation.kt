@@ -6,11 +6,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.citasmedicas.ui.screens.appointment.AppointmentScreen
-import com.citasmedicas.ui.screens.calendar.MyAppointmentsScreen
+
 import com.citasmedicas.ui.screens.doctor.DoctorDetailScreen
 import com.citasmedicas.ui.screens.home.HomeScreen
 import com.citasmedicas.ui.screens.profile.ProfileScreen
-import com.citasmedicas.ui.screens.search.SearchScreen
+
 
 /**
  * Configuración principal de navegación
@@ -40,17 +40,7 @@ fun AppNavigation(
             )
         }
         
-        // Pantalla de búsqueda
-        composable(Routes.Search.route) {
-            SearchScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onNavigateToDoctorDetail = { doctorId ->
-                    navController.navigate(Routes.DoctorDetail.createRoute(doctorId))
-                }
-            )
-        }
+
         
         // Pantalla de detalle del médico
         composable(Routes.DoctorDetail.route) { backStackEntry ->
@@ -83,24 +73,18 @@ fun AppNavigation(
             )
         }
         
-        // Pantalla de mis citas
-        composable(Routes.MyAppointments.route) {
-            MyAppointmentsScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onNavigateToDoctorDetail = { doctorId ->
-                    navController.navigate(Routes.DoctorDetail.createRoute(doctorId))
-                }
-            )
-        }
+
         
         // Pantalla de perfil
         composable(Routes.Profile.route) {
             ProfileScreen(
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onNavigateToEditProfile = {
+                    // Navegación a editar perfil (por implementar)
                 }
+
             )
         }
     }
