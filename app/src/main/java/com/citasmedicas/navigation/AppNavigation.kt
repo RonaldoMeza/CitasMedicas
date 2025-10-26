@@ -6,10 +6,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.citasmedicas.ui.screens.appointment.AppointmentScreen
+import com.citasmedicas.ui.screens.calendar.MyAppointmentsScreen
 
 import com.citasmedicas.ui.screens.doctor.DoctorDetailScreen
 import com.citasmedicas.ui.screens.home.HomeScreen
 import com.citasmedicas.ui.screens.profile.ProfileScreen
+import com.citasmedicas.ui.screens.search.SearchScreen
 
 
 /**
@@ -39,9 +41,7 @@ fun AppNavigation(
                 }
             )
         }
-        
 
-        
         // Pantalla de detalle del médico
         composable(Routes.DoctorDetail.route) { backStackEntry ->
             val doctorId = backStackEntry.arguments?.getString("doctorId") ?: ""
@@ -55,7 +55,31 @@ fun AppNavigation(
                 }
             )
         }
-        
+
+        // Pantalla de búsqueda
+        composable(Routes.Search.route) {
+            SearchScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToDoctorDetail = { doctorId ->
+                    navController.navigate(Routes.DoctorDetail.createRoute(doctorId))
+                }
+            )
+        }
+
+        // Pantalla de mis citas
+        composable(Routes.MyAppointments.route) {
+            MyAppointmentsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToDoctorDetail = { doctorId ->
+                    navController.navigate(Routes.DoctorDetail.createRoute(doctorId))
+                }
+            )
+        }
+
         // Pantalla de agendar cita
         composable(Routes.Appointment.route) { backStackEntry ->
             val doctorId = backStackEntry.arguments?.getString("doctorId") ?: ""
@@ -72,8 +96,6 @@ fun AppNavigation(
                 }
             )
         }
-        
-
         
         // Pantalla de perfil
         composable(Routes.Profile.route) {
