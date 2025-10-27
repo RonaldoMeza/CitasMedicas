@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,7 +22,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.citasmedicas.data.datasource.AppointmentDataSource
+import com.citasmedicas.model.Appointment
 import com.citasmedicas.ui.theme.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Pantalla de mis citas médicas
@@ -34,7 +37,13 @@ fun MyAppointmentsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToDoctorDetail: (String) -> Unit
 ) {
+    var appointments by remember { mutableStateOf(AppointmentDataSource.getAllAppointments()) }
     var selectedTab by remember { mutableStateOf(0) }
+
+    // Recargar citas cuando cambie la pestaña
+    LaunchedEffect(selectedTab) {
+        appointments = AppointmentDataSource.getAllAppointments()
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -112,12 +121,12 @@ fun MyAppointmentsScreen(
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("Próximas (2)") }
+                    text = { Text("Próximas (${appointments.size})") }
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text("Pasadas (2)") }
+                    text = { Text("Pasadas (0)") }
                 )
             }
 
@@ -126,9 +135,11 @@ fun MyAppointmentsScreen(
             // Contenido según la pestaña seleccionada
             when (selectedTab) {
                 0 -> UpcomingAppointmentsContent(
+                    appointments = appointments,
                     onNavigateToDoctorDetail = onNavigateToDoctorDetail
                 )
                 1 -> PastAppointmentsContent(
+                    appointments = appointments,
                     onNavigateToDoctorDetail = onNavigateToDoctorDetail
                 )
             }
@@ -138,68 +149,103 @@ fun MyAppointmentsScreen(
 
 @Composable
 fun UpcomingAppointmentsContent(
+    appointments: List<Appointment>,
     onNavigateToDoctorDetail: (String) -> Unit
 ) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        val upcomingAppointments = listOf(
-            AppointmentData(
-                id = "appointment_1",
-                doctorName = "Dra. María González",
-                specialty = "Cardiología",
-                date = "25 Oct 2025",
-                time = "10:00 AM",
-                location = "Hospital Central",
-                type = "Presencial",
-                isVirtual = false
-            ),
-            AppointmentData(
-                id = "appointment_2",
-                doctorName = "Dr. Carlos Ramírez",
-                specialty = "Neurología",
-                date = "28 Oct 2025",
-                time = "2:30 PM",
-                location = "Teleconsulta",
-                type = "Virtual",
-                isVirtual = true
-            )
+    val upcomingAppointments = appointments.map { appointment ->
+        AppointmentData(
+            id = appointment.id,
+            doctorId = appointment.doctorId,
+            doctorName = appointment.doctorName,
+            specialty = appointment.specialty,
+            date = appointment.date,
+            time = appointment.time,
+            location = "Ubicación: S/ ${appointment.price}",
+            type = "Presencial"
         )
+    }
 
-        items(upcomingAppointments) { appointment ->
-            AppointmentCard(
-                appointment = appointment,
-                onNavigateToDoctorDetail = onNavigateToDoctorDetail
-            )
+    if (upcomingAppointments.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(32.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    Icons.Default.DateRange,
+                    contentDescription = "Sin citas",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(64.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "No tienes citas próximas",
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
+            }
+        }
+    } else {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(upcomingAppointments) { appointment ->
+                AppointmentCard(
+                    appointment = appointment,
+                    onNavigateToDoctorDetail = onNavigateToDoctorDetail
+                )
+            }
         }
     }
 }
 
 @Composable
 fun PastAppointmentsContent(
+    appointments: List<Appointment>,
     onNavigateToDoctorDetail: (String) -> Unit
 ) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        val pastAppointments = listOf(
-            AppointmentData(
-                id = "appointment_3",
-                doctorName = "Dr. Juan Pérez",
-                specialty = "Pediatría",
-                date = "20 Oct 2025",
-                time = "09:00 AM",
-                location = "Clínica Infantil",
-                type = "Presencial",
-                isVirtual = false
-            )
-        )
+    // Por ahora todas las citas son consideradas próximas
+    // En una implementación real, se filtrarían por fecha
+    val pastAppointments = emptyList<AppointmentData>()
 
-        items(pastAppointments) { appointment ->
-            AppointmentCard(
-                appointment = appointment,
-                onNavigateToDoctorDetail = onNavigateToDoctorDetail
-            )
+    if (pastAppointments.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(32.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    Icons.Default.DateRange,
+                    contentDescription = "Sin citas",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(64.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "No tienes citas pasadas",
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
+            }
+        }
+    } else {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(pastAppointments) { appointment ->
+                AppointmentCard(
+                    appointment = appointment,
+                    onNavigateToDoctorDetail = onNavigateToDoctorDetail
+                )
+            }
         }
     }
 }
@@ -262,13 +308,13 @@ fun AppointmentCard(
                 // Tipo de cita
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = if (appointment.isVirtual) Color.Black else Color.LightGray
+                        containerColor = Color.LightGray
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
                         text = appointment.type,
-                        color = if (appointment.isVirtual) Color.White else Color.Black,
+                        color = Color.Black,
                         fontSize = 10.sp,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
@@ -329,7 +375,7 @@ fun AppointmentCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    if (appointment.isVirtual) Icons.Default.Call else Icons.Default.LocationOn,
+                    Icons.Default.LocationOn,
                     contentDescription = "Ubicación",
                     tint = Color.Gray,
                     modifier = Modifier.size(16.dp)
@@ -366,23 +412,13 @@ fun AppointmentCard(
                 }
 
                 Button(
-                    onClick = { onNavigateToDoctorDetail(appointment.id) },
+                    onClick = { onNavigateToDoctorDetail(appointment.doctorId) },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Black
                     )
                 ) {
-                    if (appointment.isVirtual) {
-                        Icon(
-                            Icons.Default.Call,
-                            contentDescription = "Unirse",
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Unirse")
-                    } else {
-                        Text("Ver detalles")
-                    }
+                    Text("Ver detalles")
                 }
             }
         }
@@ -391,11 +427,11 @@ fun AppointmentCard(
 
 data class AppointmentData(
     val id: String,
+    val doctorId: String,
     val doctorName: String,
     val specialty: String,
     val date: String,
     val time: String,
     val location: String,
-    val type: String,
-    val isVirtual: Boolean
+    val type: String
 )

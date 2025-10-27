@@ -22,20 +22,36 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.util.Log
+import com.citasmedicas.data.datasource.DoctorDataSource
+import com.citasmedicas.model.Doctor
 import com.citasmedicas.ui.theme.*
 
 /**
  * Pantalla de búsqueda de médicos
- * Permite buscar por especialidad, nombre o ubicación
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToDoctorDetail: (String) -> Unit
+    onNavigateToDoctorDetail: (String) -> Unit,
+    initialSearchQuery: String? = null
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-    var selectedFilter by remember { mutableStateOf("Todos") }
+    val dataSource = remember { DoctorDataSource() }
+    var searchQuery by remember { mutableStateOf(initialSearchQuery ?: "") }
+    var doctors by remember { mutableStateOf(dataSource.getAllDoctors()) }
+
+    // Filtrar médicos según búsqueda
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isBlank()) {
+            doctors = dataSource.getAllDoctors()
+        } else {
+            doctors = dataSource.getAllDoctors().filter { doctor ->
+                doctor.name.contains(searchQuery, ignoreCase = true) ||
+                        doctor.specialty.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -96,64 +112,23 @@ fun SearchScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Barra de búsqueda con filtro
-            Row(
+            // Barra de búsqueda
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("Buscar por especialidad o nombre...") },
+                leadingIcon = {
+                    Icon(Icons.Default.Search, contentDescription = "Buscar")
+                },
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    label = { Text("Especialidad, nombre...") },
-                    leadingIcon = {
-                        Icon(Icons.Default.Search, contentDescription = "Buscar")
-                    },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                IconButton(
-                    onClick = { /* Filtros avanzados */ },
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(MediTurnBlue, CircleShape)
-                ) {
-                    Icon(
-                        Icons.Default.Search,
-                        contentDescription = "Filtros",
-                        tint = Color.White
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Filtros rápidos
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                val filters = listOf("Todos", "Disponible hoy", "Mejor valorados", "Cerca de mí")
-
-                items(filters) { filter ->
-                    FilterChip(
-                        onClick = { selectedFilter = filter },
-                        label = { Text(filter) },
-                        selected = selectedFilter == filter,
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MediTurnBlue,
-                            selectedLabelColor = Color.White
-                        )
-                    )
-                }
-            }
+                shape = RoundedCornerShape(12.dp)
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Contador de resultados
             Text(
-                text = "5 médicos encontrados",
+                text = "${doctors.size} médicos encontrados",
                 fontSize = 14.sp,
                 color = Color.Gray
             )
@@ -164,10 +139,13 @@ fun SearchScreen(
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(getDoctors()) { doctor ->
+                items(doctors) { doctor ->
                     DoctorSearchCard(
                         doctor = doctor,
-                        onClick = { onNavigateToDoctorDetail(doctor.id) }
+                        onClick = {
+                            Log.d("SearchScreen", "Navegando a doctor: ${doctor.id}")
+                            onNavigateToDoctorDetail(doctor.id)
+                        }
                     )
                 }
             }
@@ -294,55 +272,4 @@ fun DoctorSearchCard(
             }
         }
     }
-}
-
-// Data class para los médicos
-data class Doctor(
-    val id: String,
-    val name: String,
-    val specialty: String,
-    val rating: Double,
-    val reviews: Int,
-    val experience: Int,
-    val location: String,
-    val isAvailable: Boolean,
-    val price: Int
-)
-
-fun getDoctors(): List<Doctor> {
-    return listOf(
-        Doctor(
-            id = "doctor_1",
-            name = "Dra. María González",
-            specialty = "Cardiología",
-            rating = 4.9,
-            reviews = 127,
-            experience = 15,
-            location = "Hospital Central",
-            isAvailable = true,
-            price = 50
-        ),
-        Doctor(
-            id = "doctor_2",
-            name = "Dr. Carlos Ramírez",
-            specialty = "Neurología",
-            rating = 4.8,
-            reviews = 98,
-            experience = 12,
-            location = "Clínica San Rafael",
-            isAvailable = true,
-            price = 60
-        ),
-        Doctor(
-            id = "doctor_3",
-            name = "Dra. Ana Martínez",
-            specialty = "Pediatría",
-            rating = 5.0,
-            reviews = 203,
-            experience = 20,
-            location = "Hospital Infantil",
-            isAvailable = false,
-            price = 45
-        )
-    )
 }

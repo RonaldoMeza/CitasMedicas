@@ -11,8 +11,10 @@
   <component name="ChangeListManager">
     <list default="true" id="7de56b19-a477-4903-b8ca-18cabf10ebdb" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/libs.versions.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/appointment/AppointmentScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/appointment/AppointmentScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/calendar/MyAppointmentsScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/calendar/MyAppointmentsScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/doctor/DoctorDetailScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/doctor/DoctorDetailScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/search/SearchScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/search/SearchScreen.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
