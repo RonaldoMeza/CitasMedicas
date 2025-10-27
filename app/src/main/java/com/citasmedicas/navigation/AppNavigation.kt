@@ -7,11 +7,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.citasmedicas.ui.screens.appointment.AppointmentScreen
 import com.citasmedicas.ui.screens.calendar.MyAppointmentsScreen
-
 import com.citasmedicas.ui.screens.doctor.DoctorDetailScreen
 import com.citasmedicas.ui.screens.home.HomeScreen
 import com.citasmedicas.ui.screens.profile.ProfileScreen
 import com.citasmedicas.ui.screens.search.SearchScreen
+import android.util.Log
 
 
 /**
@@ -30,8 +30,12 @@ fun AppNavigation(
         // Pantalla principal
         composable(Routes.Home.route) {
             HomeScreen(
-                onNavigateToSearch = {
-                    navController.navigate(Routes.Search.route)
+                onNavigateToSearch = { specialtyName ->
+                    if (specialtyName != null) {
+                        navController.navigate(Routes.Search.createRoute(specialtyName))
+                    } else {
+                        navController.navigate(Routes.Search.route)
+                    }
                 },
                 onNavigateToMyAppointments = {
                     navController.navigate(Routes.MyAppointments.route)
@@ -43,27 +47,62 @@ fun AppNavigation(
         }
 
         // Pantalla de detalle del médico
-        composable(Routes.DoctorDetail.route) { backStackEntry ->
+        composable(
+            route = Routes.DoctorDetail.route,
+            arguments = listOf(
+                androidx.navigation.navArgument("doctorId") {
+                    type = androidx.navigation.NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
             val doctorId = backStackEntry.arguments?.getString("doctorId") ?: ""
+            Log.d("AppNavigation", "Navigating to doctor detail with ID: '$doctorId'")
             DoctorDetailScreen(
                 doctorId = doctorId,
                 onNavigateBack = {
                     navController.popBackStack()
                 },
-                onNavigateToAppointment = { doctorId ->
-                    navController.navigate(Routes.Appointment.createRoute(doctorId))
+                onNavigateToAppointment = { docId ->
+                    navController.navigate(Routes.Appointment.createRoute(docId))
                 }
             )
         }
 
         // Pantalla de búsqueda
-        composable(Routes.Search.route) {
+        composable(
+            route = "search?searchQuery={searchQuery}",
+            arguments = listOf(
+                androidx.navigation.navArgument("searchQuery") {
+                    type = androidx.navigation.NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) { backStackEntry ->
+            val searchQuery = backStackEntry.arguments?.getString("searchQuery")
             SearchScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
                 onNavigateToDoctorDetail = { doctorId ->
-                    navController.navigate(Routes.DoctorDetail.createRoute(doctorId))
+                    Log.d("AppNavigation", "Creating route for doctor: $doctorId")
+                    val route = Routes.DoctorDetail.createRoute(doctorId)
+                    Log.d("AppNavigation", "Navigating to: $route")
+                    navController.navigate(route)
+                },
+                initialSearchQuery = searchQuery
+            )
+        }
+        
+        // Ruta alternativa sin parámetros
+        composable("search") {
+            SearchScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToDoctorDetail = { doctorId ->
+                    val route = Routes.DoctorDetail.createRoute(doctorId)
+                    navController.navigate(route)
                 }
             )
         }
@@ -75,13 +114,23 @@ fun AppNavigation(
                     navController.popBackStack()
                 },
                 onNavigateToDoctorDetail = { doctorId ->
-                    navController.navigate(Routes.DoctorDetail.createRoute(doctorId))
+                    Log.d("AppNavigation", "Creating route for doctor: $doctorId")
+                    val route = Routes.DoctorDetail.createRoute(doctorId)
+                    Log.d("AppNavigation", "Navigating to: $route")
+                    navController.navigate(route)
                 }
             )
         }
 
         // Pantalla de agendar cita
-        composable(Routes.Appointment.route) { backStackEntry ->
+        composable(
+            route = Routes.Appointment.route,
+            arguments = listOf(
+                androidx.navigation.navArgument("doctorId") {
+                    type = androidx.navigation.NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
             val doctorId = backStackEntry.arguments?.getString("doctorId") ?: ""
             AppointmentScreen(
                 doctorId = doctorId,
@@ -106,7 +155,6 @@ fun AppNavigation(
                 onNavigateToEditProfile = {
                     // Navegación a editar perfil (por implementar)
                 }
-
             )
         }
     }

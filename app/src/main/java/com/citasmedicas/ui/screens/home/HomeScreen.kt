@@ -28,7 +28,7 @@ import com.citasmedicas.ui.theme.*
  */
 @Composable
 fun HomeScreen(
-    onNavigateToSearch: () -> Unit,
+    onNavigateToSearch: (String?) -> Unit,
     onNavigateToMyAppointments: () -> Unit,
     onNavigateToProfile: () -> Unit
 ) {
@@ -46,7 +46,9 @@ fun HomeScreen(
         // Especialidades
         item {
             SpecialtiesSection(
-                onNavigateToSearch = onNavigateToSearch
+                onSpecialtyClick = { specialtyName ->
+                    onNavigateToSearch(specialtyName)
+                }
             )
         }
         
@@ -66,7 +68,7 @@ fun HomeScreen(
 @Composable
 fun HeaderSection(
     onNavigateToProfile: () -> Unit,
-    onNavigateToSearch: () -> Unit
+    onNavigateToSearch: (String?) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -93,7 +95,7 @@ fun HeaderSection(
             
             // Barra de búsqueda
             Card(
-                onClick = onNavigateToSearch,
+                onClick = { onNavigateToSearch(null) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(12.dp)
@@ -124,7 +126,7 @@ fun HeaderSection(
             // Icono de notificaciones
             Box {
                 IconButton(onClick = {
-                    // Acción de notificaciones por implementar
+                    // Navegar a la pantalla de notificaciones
                 }) {
                     Icon(
                         Icons.Default.Notifications,
@@ -170,7 +172,7 @@ fun HeaderSection(
 
 @Composable
 fun SpecialtiesSection(
-    onNavigateToSearch: () -> Unit
+    onSpecialtyClick: (String) -> Unit
 ) {
     Column(
         modifier = Modifier.padding(16.dp)
@@ -191,7 +193,7 @@ fun SpecialtiesSection(
             items(getSpecialties()) { specialty ->
                 SpecialtyCard(
                     specialty = specialty,
-                    onClick = onNavigateToSearch
+                    onClick = { onSpecialtyClick(specialty.name) }
                 )
             }
         }
@@ -246,7 +248,7 @@ fun SpecialtyCard(
 
 @Composable
 fun FeaturedDoctorsSection(
-    onNavigateToSearch: () -> Unit
+    onNavigateToSearch: (String?) -> Unit
 ) {
     Column(
         modifier = Modifier.padding(16.dp)
@@ -263,7 +265,7 @@ fun FeaturedDoctorsSection(
                 color = Color.Black
             )
             
-            TextButton(onClick = onNavigateToSearch) {
+            TextButton(onClick = { onNavigateToSearch(null) }) {
                 Text(
                     text = "Ver todos",
                     color = MediTurnBlue,
@@ -278,7 +280,7 @@ fun FeaturedDoctorsSection(
         DoctorCard(
             name = "Dra. María González",
             specialty = "Cardiología",
-            onClick = onNavigateToSearch
+            onClick = { onNavigateToSearch(null) }
         )
     }
 }
@@ -287,10 +289,10 @@ fun FeaturedDoctorsSection(
 fun DoctorCard(
     name: String,
     specialty: String,
-    onClick: () -> Unit
+    onClick: (String?) -> Unit
 ) {
     Card(
-        onClick = onClick,
+        onClick = { onClick(null) },
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),

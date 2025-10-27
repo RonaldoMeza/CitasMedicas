@@ -5,7 +5,11 @@ package com.citasmedicas.navigation
  */
 sealed class Routes(val route: String) {
     object Home : Routes("home")
-    object Search : Routes("search")
+    object Search : Routes("search") {
+        fun createRoute(searchQuery: String? = null) = 
+            if (searchQuery != null) "search?searchQuery=$searchQuery" 
+            else "search"
+    }
     object DoctorDetail : Routes("doctor_detail/{doctorId}") {
         fun createRoute(doctorId: String) = "doctor_detail/$doctorId"
     }
