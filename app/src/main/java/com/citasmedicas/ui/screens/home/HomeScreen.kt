@@ -8,9 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.citasmedicas.ui.theme.*
+import com.citasmedicas.ui.components.NotificationIcon
+import com.citasmedicas.ui.components.getUnreadNotificationCount
+import com.citasmedicas.data.repository.DoctorRepository
+import com.citasmedicas.model.Doctor
+import androidx.compose.foundation.text.BasicTextField
 
 /**
  * Pantalla principal de MediTurn - Diseño Figma
@@ -30,33 +33,66 @@ import com.citasmedicas.ui.theme.*
 fun HomeScreen(
     onNavigateToSearch: (String?) -> Unit,
     onNavigateToMyAppointments: () -> Unit,
-    onNavigateToProfile: () -> Unit
+    onNavigateToProfile: () -> Unit,
+    onNavigateToAppointment: (String) -> Unit = {},
+    onNavigateToNotifications: () -> Unit = {}
 ) {
+    val doctorRepository = remember { DoctorRepository() }
+    var searchQuery by remember { mutableStateOf("") }
+    var searchResults by remember { mutableStateOf<List<Doctor>>(emptyList()) }
+    var isSearching by remember { mutableStateOf(false) }
+
+    // Realizar búsqueda cuando cambia el texto
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isNotBlank()) {
+            isSearching = true
+            searchResults = doctorRepository.searchDoctorsByName(searchQuery)
+        } else {
+            isSearching = false
+            searchResults = emptyList()
+        }
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Header
+        // Header con búsqueda
         item {
             HeaderSection(
                 onNavigateToProfile = onNavigateToProfile,
-                onNavigateToSearch = onNavigateToSearch
+                onNavigateToSearch = onNavigateToSearch,
+                onNavigateToNotifications = onNavigateToNotifications,
+                searchQuery = searchQuery,
+                onSearchQueryChanged = { searchQuery = it }
             )
         }
         
-        // Especialidades
-        item {
-            SpecialtiesSection(
-                onSpecialtyClick = { specialtyName ->
-                    onNavigateToSearch(specialtyName)
-                }
-            )
-        }
-        
-        // Médicos destacados
-        item {
-            FeaturedDoctorsSection(
-                onNavigateToSearch = onNavigateToSearch
-            )
+        // Si hay búsqueda, mostrar resultados
+        if (isSearching) {
+            item {
+                SearchResultsSection(
+                    results = searchResults,
+                    searchQuery = searchQuery,
+                    onNavigateToAppointment = onNavigateToAppointment
+                )
+            }
+        } else {
+            // Especialidades
+            item {
+                SpecialtiesSection(
+                    onSpecialtyClick = { specialtyName ->
+                        onNavigateToSearch(specialtyName)
+                    }
+                )
+            }
+            
+            // Médicos destacados
+            item {
+                FeaturedDoctorsSection(
+                    onNavigateToSearch = onNavigateToSearch,
+                    onNavigateToAppointment = onNavigateToAppointment
+                )
+            }
         }
 
         item {
@@ -68,8 +104,13 @@ fun HomeScreen(
 @Composable
 fun HeaderSection(
     onNavigateToProfile: () -> Unit,
-    onNavigateToSearch: (String?) -> Unit
+    onNavigateToSearch: (String?) -> Unit,
+    onNavigateToNotifications: () -> Unit,
+    searchQuery: String,
+    onSearchQueryChanged: (String) -> Unit
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -93,26 +134,44 @@ fun HeaderSection(
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Barra de búsqueda
+            // Barra de búsqueda editable
             Card(
-                onClick = { onNavigateToSearch(null) },
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Row(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         Icons.Default.Search,
                         contentDescription = "Buscar",
-                        tint = Color.Gray
+                        tint = colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = "Buscar médicos, especialidades...",
-                        color = Color.Gray
+                    BasicTextField(
+                        value = searchQuery,
+                        onValueChange = onSearchQueryChanged,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontSize = 16.sp,
+                            color = colorScheme.onSurface
+                        ),
+                        decorationBox = { innerTextField ->
+                            Box(modifier = Modifier.fillMaxWidth()) {
+                                if (searchQuery.isEmpty()) {
+                                    Text(
+                                        text = "Buscar médicos, especialidades...",
+                                        color = colorScheme.onSurface.copy(alpha = 0.6f),
+                                        fontSize = 16.sp
+                                    )
+                                }
+                                innerTextField()
+                            }
+                        }
                     )
                 }
             }
@@ -123,32 +182,13 @@ fun HeaderSection(
             modifier = Modifier.align(Alignment.TopEnd),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Icono de notificaciones
-            Box {
-                IconButton(onClick = {
-                    // Navegar a la pantalla de notificaciones
-                }) {
-                    Icon(
-                        Icons.Default.Notifications,
-                        contentDescription = "Notificaciones",
-                        tint = Color.White
-                    )
-                }
-                // Indicador de notificaciones no leídas
-                Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .background(Color.Red, CircleShape)
-                        .align(Alignment.TopEnd)
-                ) {
-                    Text(
-                        text = "2",
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-            }
+            // Icono de notificaciones con badge dinámico
+            val unreadCount = getUnreadNotificationCount()
+            NotificationIcon(
+                onClick = onNavigateToNotifications,
+                badgeCount = unreadCount,
+                tint = Color.White
+            )
             
             // Foto de perfil
             IconButton(onClick = onNavigateToProfile) {
@@ -174,6 +214,8 @@ fun HeaderSection(
 fun SpecialtiesSection(
     onSpecialtyClick: (String) -> Unit
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
@@ -181,7 +223,7 @@ fun SpecialtiesSection(
             text = "Especialidades",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = colorScheme.onSurface
         )
         
         Spacer(modifier = Modifier.height(16.dp))
@@ -239,7 +281,7 @@ fun SpecialtyCard(
                 text = specialty.name,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
         }
@@ -248,8 +290,19 @@ fun SpecialtyCard(
 
 @Composable
 fun FeaturedDoctorsSection(
-    onNavigateToSearch: (String?) -> Unit
+    onNavigateToSearch: (String?) -> Unit,
+    onNavigateToAppointment: (String) -> Unit = {}
 ) {
+    val doctorRepository = remember { DoctorRepository() }
+    val colorScheme = MaterialTheme.colorScheme
+    
+    // Obtener médicos disponibles
+    var availableDoctors by remember { mutableStateOf<List<Doctor>>(emptyList()) }
+    
+    LaunchedEffect(Unit) {
+        availableDoctors = doctorRepository.getAvailableDoctors()
+    }
+    
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
@@ -259,10 +312,10 @@ fun FeaturedDoctorsSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Médicos Destacados",
+                text = "Médicos Disponibles",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = colorScheme.onSurface
             )
             
             TextButton(onClick = { onNavigateToSearch(null) }) {
@@ -276,25 +329,118 @@ fun FeaturedDoctorsSection(
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        // Lista de médicos destacados
-        DoctorCard(
-            name = "Dra. María González",
-            specialty = "Cardiología",
-            onClick = { onNavigateToSearch(null) }
+        // Lista de médicos disponibles
+        if (availableDoctors.isNotEmpty()) {
+            availableDoctors.forEach { doctor ->
+                DoctorCard(
+                    doctor = doctor,
+                    onClick = {
+                        onNavigateToAppointment(doctor.id)
+                    }
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Cargando...",
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchResultsSection(
+    results: List<Doctor>,
+    searchQuery: String,
+    onNavigateToAppointment: (String) -> Unit
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    
+    Column(
+        modifier = Modifier.padding(16.dp)
+    ) {
+        Text(
+            text = "Resultados de búsqueda: \"$searchQuery\"",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorScheme.onSurface
         )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        Text(
+            text = "${results.size} médicos encontrados",
+            fontSize = 14.sp,
+            color = colorScheme.onSurface.copy(alpha = 0.6f)
+        )
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        if (results.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = "Sin resultados",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "No se encontraron médicos",
+                        fontSize = 16.sp,
+                        color = colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                    Text(
+                        text = "Intenta con otros términos de búsqueda",
+                        fontSize = 14.sp,
+                        color = colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                }
+            }
+        } else {
+            results.forEach { doctor ->
+                DoctorCard(
+                    doctor = doctor,
+                    onClick = {
+                        onNavigateToAppointment(doctor.id)
+                    }
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
     }
 }
 
 @Composable
 fun DoctorCard(
-    name: String,
-    specialty: String,
-    onClick: (String?) -> Unit
+    doctor: Doctor? = null,
+    name: String = "",
+    specialty: String = "",
+    onClick: () -> Unit = {}
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val displayName = doctor?.name ?: name
+    val displaySpecialty = doctor?.specialty ?: specialty
+    
     Card(
-        onClick = { onClick(null) },
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -319,21 +465,73 @@ fun DoctorCard(
             
             Spacer(modifier = Modifier.width(16.dp))
             
-            Column {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
-                    text = name,
+                    text = displayName,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = colorScheme.onSurface
                 )
                 
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = specialty,
+                    text = displaySpecialty,
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = colorScheme.onSurface.copy(alpha = 0.6f)
                 )
+                
+                // Mostrar información adicional si hay doctor completo
+                doctor?.let {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Star,
+                            contentDescription = "Calificación",
+                            tint = Color(0xFFFFD700),
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${it.rating} (${it.reviews})",
+                            fontSize = 12.sp,
+                            color = colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "S/ ${it.price}",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MediTurnBlue
+                    )
+                }
+            }
+            
+            // Indicador de disponibilidad
+            doctor?.let {
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (it.isAvailable) MediTurnBlue else Color.LightGray
+                        ),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Text(
+                            text = if (it.isAvailable) "Disponible" else "Ocupado",
+                            color = Color.White,
+                            fontSize = 10.sp,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
             }
         }
     }
