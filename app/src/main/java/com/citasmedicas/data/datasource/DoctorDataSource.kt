@@ -6,12 +6,12 @@ import com.citasmedicas.model.Doctor
  * DataSource para obtener datos de médicos
  */
 class DoctorDataSource {
-    
+
     // Datos simulados
     private val doctors = listOf(
         Doctor(
             id = "doctor_1",
-            name = "Dra. María González",
+            name = "Dra. Mariana González",
             specialty = "Cardiología",
             rating = 4.9,
             reviews = 127,
@@ -20,7 +20,7 @@ class DoctorDataSource {
             isAvailable = true,
             price = 50,
             schedule = listOf("09:00", "10:00", "11:00", "14:00", "15:00", "16:00"),
-            description = "Especialista en enfermedades cardiovasculares con más de 15 años de experiencia. Tratamiento de hipertensión, arritmias y rehabilitación cardiaca.",
+            description = "Cardióloga con 15 años de experiencia en diagnóstico y manejo de enfermedades cardiovasculares. Manejo de hipertensión, arritmias, ecocardiografía y rehabilitación cardiaca.",
             phoneNumber = "+51 987 654 321"
         ),
         Doctor(
@@ -34,7 +34,7 @@ class DoctorDataSource {
             isAvailable = true,
             price = 60,
             schedule = listOf("08:00", "10:00", "11:00", "13:00", "14:00", "16:00"),
-            description = "Experto en trastornos neurológicos y enfermedades del sistema nervioso. Diagnóstico y tratamiento de migrañas, epilepsia y trastornos del sueño.",
+            description = "Neurólogo especialista en migraña, epilepsia y trastornos del sueño. Experiencia en consultas ambulatorias y estudios diagnósticos (EEG, valoración neuroclínica).",
             phoneNumber = "+51 987 654 322"
         ),
         Doctor(
@@ -48,7 +48,7 @@ class DoctorDataSource {
             isAvailable = false,
             price = 45,
             schedule = listOf("08:00", "09:00", "10:00", "14:00", "15:00", "16:00"),
-            description = "Pediatra con amplia experiencia en cuidado infantil y desarrollo del niño. Atención desde recién nacidos hasta adolescentes.",
+            description = "Pediatra con amplia trayectoria en seguimiento del crecimiento y desarrollo, vacunas y manejo de patologías agudas y crónicas en niños y adolescentes.",
             phoneNumber = "+51 987 654 323"
         ),
         Doctor(
@@ -62,7 +62,7 @@ class DoctorDataSource {
             isAvailable = true,
             price = 40,
             schedule = listOf("09:00", "10:00", "11:00", "14:00", "15:00"),
-            description = "Médico generalista con enfoque en prevención y atención primaria. Consultas generales y seguimiento de enfermedades crónicas.",
+            description = "Médico general con enfoque preventivo y manejo integral de atención primaria. Seguimiento de enfermedades crónicas, control de factores de riesgo y derivación especializada cuando corresponde.",
             phoneNumber = "+51 987 654 324"
         ),
         Doctor(
@@ -76,31 +76,58 @@ class DoctorDataSource {
             isAvailable = true,
             price = 55,
             schedule = listOf("09:00", "10:00", "11:00", "14:00", "15:00", "16:00"),
-            description = "Especialista en enfermedades de la piel, pelo y uñas. Tratamiento de acné, psoriasis y cirugía dermatológica.",
+            description = "Dermatóloga con experiencia en diagnóstico y tratamiento de enfermedades de la piel, pelo y uñas. Manejo de acné, dermatitis, psoriasis y procedimientos menores dermatológicos.",
             phoneNumber = "+51 987 654 325"
         )
     )
-    
+
+
     /**
      * Obtener todos los médicos
      */
     fun getAllDoctors(): List<Doctor> {
         return doctors
     }
-    
+
     /**
      * Buscar médico por ID
      */
     fun getDoctorById(id: String): Doctor? {
         return doctors.find { it.id == id }
     }
-    
+
     /**
      * Buscar médicos por especialidad
      */
     fun getDoctorsBySpecialty(specialty: String): List<Doctor> {
-        return doctors.filter { 
-            it.specialty.contains(specialty, ignoreCase = true) 
+        return doctors.filter {
+            it.specialty.contains(specialty, ignoreCase = true)
         }
+    }
+
+    /**
+     * Buscar médicos por nombre
+     */
+    fun searchDoctorsByName(query: String): List<Doctor> {
+        return doctors.filter {
+            it.name.contains(query, ignoreCase = true) ||
+                    it.specialty.contains(query, ignoreCase = true)
+        }
+    }
+
+    /**
+     * Buscar médicos por ubicación
+     */
+    fun getDoctorsByLocation(location: String): List<Doctor> {
+        return doctors.filter {
+            it.location.contains(location, ignoreCase = true)
+        }
+    }
+
+    /**
+     * Filtrar médicos que soporten teleconsulta
+     */
+    fun getDoctorsWithTelemedicine(): List<Doctor> {
+        return doctors.filter { it.supportsTelemedicine }
     }
 }

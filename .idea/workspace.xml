@@ -15,13 +15,12 @@
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/deviceManager.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deviceManager.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/datasource/AppointmentDataSource.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/datasource/AppointmentDataSource.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/datasource/DoctorDataSource.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/datasource/DoctorDataSource.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/repository/DoctorRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/repository/DoctorRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Appointment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Appointment.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Doctor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Doctor.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Slot.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Slot.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/navigation/AppNavigation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/navigation/AppNavigation.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/navigation/Routes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/navigation/Routes.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/appointment/AppointmentScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/appointment/AppointmentScreen.kt" afterDir="false" />
@@ -41,7 +40,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\aldai\.android\avd\Pixel_Tablet.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\RNK\.android\avd\Pixel_7.avd)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -99,7 +98,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "com.google.services.firebase.aqiPopupShown": "true",
-    "git-widget-placeholder": "yordy",
+    "git-widget-placeholder": "ronaldo",
     "last_opened_file_path": "F:/Program_Languages/Kotlin/AndroidStudio/CitasMedicas/app/src/main/java/com/citasmedicas/ui/screens/profile",
     "project.structure.last.edited": "SDK Location",
     "project.structure.proportion": "0.17",
