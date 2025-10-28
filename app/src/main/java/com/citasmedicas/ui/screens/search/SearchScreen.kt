@@ -8,11 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import android.util.Log
-import com.citasmedicas.data.datasource.DoctorDataSource
+import com.citasmedicas.data.repository.DoctorRepository
 import com.citasmedicas.model.Doctor
 import com.citasmedicas.ui.theme.*
 
@@ -35,24 +31,36 @@ import com.citasmedicas.ui.theme.*
 fun SearchScreen(
     onNavigateBack: () -> Unit,
     onNavigateToDoctorDetail: (String) -> Unit,
-    initialSearchQuery: String? = null
+    initialSearchQuery: String? = null,
+    onNavigateToNotifications: () -> Unit = {}
 ) {
-    val dataSource = remember { DoctorDataSource() }
+    val repository = remember { DoctorRepository() }
     var searchQuery by remember { mutableStateOf(initialSearchQuery ?: "") }
-    var doctors by remember { mutableStateOf(dataSource.getAllDoctors()) }
+    var doctors by remember { mutableStateOf(repository.getAllDoctors()) }
+    var showTelemedicineFilter by remember { mutableStateOf(false) }
 
-    // Filtrar médicos según búsqueda
-    LaunchedEffect(searchQuery) {
-        if (searchQuery.isBlank()) {
-            doctors = dataSource.getAllDoctors()
-        } else {
-            doctors = dataSource.getAllDoctors().filter { doctor ->
+    // Filtrar médicos según búsqueda y filtros
+    LaunchedEffect(searchQuery, showTelemedicineFilter) {
+        var filteredDoctors = repository.getAllDoctors()
+        
+        // Filtro por teleconsulta
+        if (showTelemedicineFilter) {
+            filteredDoctors = repository.getDoctorsWithTelemedicine()
+        }
+        
+        // Filtro por búsqueda
+        if (searchQuery.isNotBlank()) {
+            filteredDoctors = filteredDoctors.filter { doctor ->
                 doctor.name.contains(searchQuery, ignoreCase = true) ||
-                        doctor.specialty.contains(searchQuery, ignoreCase = true)
+                doctor.specialty.contains(searchQuery, ignoreCase = true)
             }
         }
+        
+        doctors = filteredDoctors
     }
 
+    val colorScheme = MaterialTheme.colorScheme
+    
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -60,7 +68,7 @@ fun SearchScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(colorScheme.surface)
                 .padding(16.dp)
         ) {
             Row(
@@ -76,33 +84,17 @@ fun SearchScreen(
                     text = "Buscar Médicos",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = colorScheme.onSurface
                 )
 
                 Row {
-                    // Notificaciones
-                    Box {
-                        IconButton(onClick = { /* Notificaciones */ }) {
-                            Icon(
-                                Icons.Default.Notifications,
-                                contentDescription = "Notificaciones",
-                                tint = Color.Gray
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .size(16.dp)
-                                .background(Color.Red, CircleShape)
-                                .align(Alignment.TopEnd)
-                        ) {
-                            Text(
-                                text = "2",
-                                color = Color.White,
-                                fontSize = 10.sp,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                    }
+                    // Notificaciones con badge dinámico
+                    val unreadCount = com.citasmedicas.ui.components.getUnreadNotificationCount()
+                    com.citasmedicas.ui.components.NotificationIconSmall(
+                        onClick = onNavigateToNotifications,
+                        badgeCount = unreadCount,
+                        tint = colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
                 }
             }
         }
@@ -126,11 +118,19 @@ fun SearchScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Filtros
+            FilterChipsRow(
+                showTelemedicine = showTelemedicineFilter,
+                onTelemedicineFilterChanged = { showTelemedicineFilter = it }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Contador de resultados
             Text(
                 text = "${doctors.size} médicos encontrados",
                 fontSize = 14.sp,
-                color = Color.Gray
+                color = colorScheme.onSurface.copy(alpha = 0.6f)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -158,10 +158,12 @@ fun DoctorSearchCard(
     doctor: Doctor,
     onClick: () -> Unit
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -193,7 +195,7 @@ fun DoctorSearchCard(
                     text = doctor.name,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = colorScheme.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -201,7 +203,7 @@ fun DoctorSearchCard(
                 Text(
                     text = doctor.specialty,
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = colorScheme.onSurface.copy(alpha = 0.6f)
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -219,7 +221,7 @@ fun DoctorSearchCard(
                     Text(
                         text = "${doctor.rating} (${doctor.reviews})",
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
 
@@ -228,7 +230,7 @@ fun DoctorSearchCard(
                 Text(
                     text = "${doctor.experience} años",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = colorScheme.onSurface.copy(alpha = 0.6f)
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -236,7 +238,7 @@ fun DoctorSearchCard(
                 Text(
                     text = doctor.location,
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
 
@@ -246,13 +248,13 @@ fun DoctorSearchCard(
                 // Estado de disponibilidad
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = if (doctor.isAvailable) Color.Black else Color.LightGray
+                        containerColor = if (doctor.isAvailable) MediTurnBlue else colorScheme.onSurface.copy(alpha = 0.3f)
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
                         text = if (doctor.isAvailable) "Disponible" else "Ocupado",
-                        color = Color.White,
+                        color = if (doctor.isAvailable) Color.White else colorScheme.onSurface,
                         fontSize = 10.sp,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
@@ -270,6 +272,27 @@ fun DoctorSearchCard(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun FilterChipsRow(
+    showTelemedicine: Boolean,
+    onTelemedicineFilterChanged: (Boolean) -> Unit
+) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            FilterChip(
+                selected = showTelemedicine,
+                onClick = { onTelemedicineFilterChanged(!showTelemedicine) },
+                leadingIcon = if (showTelemedicine) {
+                    { Icon(Icons.Default.Phone, "") }
+                } else null,
+                label = { Text("Teleconsulta") }
+            )
         }
     }
 }

@@ -26,14 +26,15 @@ import com.citasmedicas.ui.theme.*
 @Composable
 fun ProfileScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToEditProfile: () -> Unit
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToNotifications: () -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         // Header
         item {
-            ProfileHeaderSection()
+            ProfileHeaderSection(onNavigateToNotifications = onNavigateToNotifications)
         }
         
         // Información básica
@@ -55,7 +56,7 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileHeaderSection() {
+fun ProfileHeaderSection(onNavigateToNotifications: () -> Unit = {}) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -74,29 +75,13 @@ fun ProfileHeaderSection() {
                 color = Color.White
             )
             
-            // Notificaciones
-            Box {
-                IconButton(onClick = { /* Notificaciones */ }) {
-                    Icon(
-                        Icons.Default.Notifications,
-                        contentDescription = "Notificaciones",
-                        tint = Color.White
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .background(Color.Red, CircleShape)
-                        .align(Alignment.TopEnd)
-                ) {
-                    Text(
-                        text = "2",
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-            }
+            // Notificaciones con badge dinámico
+            val unreadCount = com.citasmedicas.ui.components.getUnreadNotificationCount()
+            com.citasmedicas.ui.components.NotificationIcon(
+                onClick = onNavigateToNotifications,
+                badgeCount = unreadCount,
+                tint = Color.White
+            )
         }
     }
 }

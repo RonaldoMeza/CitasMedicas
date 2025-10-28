@@ -11,6 +11,9 @@ import com.citasmedicas.ui.screens.doctor.DoctorDetailScreen
 import com.citasmedicas.ui.screens.home.HomeScreen
 import com.citasmedicas.ui.screens.profile.ProfileScreen
 import com.citasmedicas.ui.screens.search.SearchScreen
+import com.citasmedicas.ui.screens.notifications.NotificationsScreen
+import com.citasmedicas.model.Appointment
+import com.citasmedicas.data.repository.AppointmentRepository
 import android.util.Log
 
 
@@ -22,6 +25,8 @@ fun AppNavigation(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val appointmentRepository = AppointmentRepository()
+
     NavHost(
         navController = navController,
         startDestination = Routes.Home.route,
@@ -42,6 +47,12 @@ fun AppNavigation(
                 },
                 onNavigateToProfile = {
                     navController.navigate(Routes.Profile.route)
+                },
+                onNavigateToAppointment = { doctorId ->
+                    navController.navigate(Routes.Appointment.createRoute(doctorId))
+                },
+                onNavigateToNotifications = {
+                    navController.navigate(Routes.Notifications.route)
                 }
             )
         }
@@ -90,10 +101,13 @@ fun AppNavigation(
                     Log.d("AppNavigation", "Navigating to: $route")
                     navController.navigate(route)
                 },
-                initialSearchQuery = searchQuery
+                initialSearchQuery = searchQuery,
+                onNavigateToNotifications = {
+                    navController.navigate(Routes.Notifications.route)
+                }
             )
         }
-        
+
         // Ruta alternativa sin parámetros
         composable("search") {
             SearchScreen(
@@ -103,6 +117,9 @@ fun AppNavigation(
                 onNavigateToDoctorDetail = { doctorId ->
                     val route = Routes.DoctorDetail.createRoute(doctorId)
                     navController.navigate(route)
+                },
+                onNavigateToNotifications = {
+                    navController.navigate(Routes.Notifications.route)
                 }
             )
         }
@@ -118,34 +135,69 @@ fun AppNavigation(
                     val route = Routes.DoctorDetail.createRoute(doctorId)
                     Log.d("AppNavigation", "Navigating to: $route")
                     navController.navigate(route)
+                },
+                onNavigateToAppointmentDetail = { appointment ->
+                    // Mostrar detalles de la cita en un diálogo o nueva pantalla
+                    // Por ahora lo dejamos vacío o podemos crear una pantalla de detalles
+                    Log.d("AppNavigation", "Showing appointment detail: ${appointment.id}")
+                },
+                onNavigateToAppointment = { identifier ->
+                    // El identificador puede ser un appointmentId o un doctorId
+                    if (identifier.startsWith("appointment_")) {
+                        // Es un ID de cita - buscar la cita para obtener el doctorId
+                        val appointment = appointmentRepository.getAppointmentById(identifier)
+                        appointment?.let {
+                            Log.d("AppNavigation", "Reprogramming appointment: ${it.id} for doctor: ${it.doctorId}")
+                            navController.navigate(Routes.Appointment.createRoute(it.doctorId, it.id))
+                        }
+                    } else {
+                        // Es un doctorId directamente
+                        navController.navigate(Routes.Appointment.createRoute(identifier))
+                    }
+                },
+                onNavigateToSearch = {
+                    navController.navigate(Routes.Search.route)
+                },
+                onNavigateToNotifications = {
+                    navController.navigate(Routes.Notifications.route)
                 }
             )
         }
 
         // Pantalla de agendar cita
         composable(
-            route = Routes.Appointment.route,
+            route = "appointment/{doctorId}/{appointmentId}",
             arguments = listOf(
                 androidx.navigation.navArgument("doctorId") {
                     type = androidx.navigation.NavType.StringType
+                },
+                androidx.navigation.navArgument("appointmentId") {
+                    type = androidx.navigation.NavType.StringType
+                    nullable = true
+                    defaultValue = "null"
                 }
             )
         ) { backStackEntry ->
             val doctorId = backStackEntry.arguments?.getString("doctorId") ?: ""
+            val appointmentId = backStackEntry.arguments?.getString("appointmentId")
+
+            android.util.Log.d("AppNavigation", "Received doctorId: '$doctorId', appointmentId: '$appointmentId'")
+
             AppointmentScreen(
+                appointmentId = if (appointmentId == "null" || appointmentId.isNullOrBlank()) null else appointmentId,
                 doctorId = doctorId,
                 onNavigateBack = {
                     navController.popBackStack()
                 },
                 onAppointmentScheduled = {
-                    // Navegar a mis citas después de agendar
+                    // Navegar a mis citas después de agendar/reprogramar
                     navController.navigate(Routes.MyAppointments.route) {
                         popUpTo(Routes.Home.route) { inclusive = false }
                     }
                 }
             )
         }
-        
+
         // Pantalla de perfil
         composable(Routes.Profile.route) {
             ProfileScreen(
@@ -154,6 +206,23 @@ fun AppNavigation(
                 },
                 onNavigateToEditProfile = {
                     // Navegación a editar perfil (por implementar)
+                },
+                onNavigateToNotifications = {
+                    navController.navigate(Routes.Notifications.route)
+                }
+            )
+        }
+
+        // Pantalla de notificaciones
+        composable(Routes.Notifications.route) {
+            NotificationsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToAppointmentDetail = { appointment ->
+                    // Regresar y navegar a mis citas para ver el detalle
+                    navController.popBackStack()
+                    // Opcional: podríamos navegar directamente al detalle de la cita
                 }
             )
         }

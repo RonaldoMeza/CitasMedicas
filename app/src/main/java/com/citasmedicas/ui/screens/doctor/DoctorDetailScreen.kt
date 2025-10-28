@@ -335,35 +335,61 @@ fun AvailableTimesSection(
 ) {
     var selectedTime by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier.padding(16.dp)
+    Card(
+        modifier = Modifier.padding(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Text(
-            text = "Horarios Disponibles",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.DateRange,
+                    contentDescription = "Horarios",
+                    tint = MediTurnBlue,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Horarios Disponibles",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+            }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Lista de horarios
-        schedule.forEach { time ->
-            FilterChip(
-                onClick = {
-                    selectedTime = time
-                    onTimeSelected(time)
-                },
-                label = { Text(time) },
-                selected = selectedTime == time,
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MediTurnBlue,
-                    selectedLabelColor = Color.White
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-            )
+            // Mostrar horarios en filas horizontales (3 por fila)
+            schedule.chunked(3).forEachIndexed { index, timeRow ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    timeRow.forEach { time ->
+                        FilterChip(
+                            onClick = {
+                                selectedTime = time
+                                onTimeSelected(time)
+                            },
+                            label = { Text(time) },
+                            selected = selectedTime == time,
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MediTurnBlue,
+                                selectedLabelColor = Color.White
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+                if (index < schedule.chunked(3).size - 1) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
         }
     }
 }

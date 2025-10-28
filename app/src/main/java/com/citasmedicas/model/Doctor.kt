@@ -16,5 +16,6 @@ data class Doctor(
     val schedule: List<String> = emptyList(), // Horarios disponibles
     val imageUrl: String = "", // URL de la imagen
     val description: String = "", // Descripción del médico
-    val phoneNumber: String = "" // Número de teléfono
+    val phoneNumber: String = "", // Número de teléfono
+    val supportsTelemedicine: Boolean = false // Soporte para teleconsulta
 )
