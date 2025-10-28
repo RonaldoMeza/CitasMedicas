@@ -18,7 +18,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.citasmedicas.data.repository.AppointmentRepository
-import com.citasmedicas.data.repository.SlotRepository
 import com.citasmedicas.data.repository.DoctorRepository
 import com.citasmedicas.model.Doctor
 import com.citasmedicas.model.Appointment
@@ -39,7 +38,6 @@ fun AppointmentScreen(
 ) {
     val doctorRepository = remember { DoctorRepository() }
     val appointmentRepository = remember { AppointmentRepository() }
-    val slotRepository = remember { SlotRepository() }
 
     // Estado para el doctor
     var doctor by remember { mutableStateOf<Doctor?>(null) }
@@ -98,14 +96,6 @@ fun AppointmentScreen(
 
     var showDatePickerDialog by remember { mutableStateOf(false) }
 
-    // Convertir fecha seleccionada a string
-    val selectedDateString = remember(datePickerState.selectedDateMillis) {
-        datePickerState.selectedDateMillis?.let { millis ->
-            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            formatter.format(millis)
-        } ?: ""
-    }
-
     if (isLoading) {
         // Mostrar un indicador de carga
         Box(
@@ -141,7 +131,7 @@ fun AppointmentScreen(
 
                     // Selección de fecha
                     DatePickerSection(
-                        selectedDate = selectedDateString,
+                        selectedDate = selectedDate,
                         onDateClick = { showDatePickerDialog = true }
                     )
 
@@ -167,13 +157,13 @@ fun AppointmentScreen(
                     // Resumen y botón confirmar
                     SummaryCard(
                         doctor = doctor,
-                        date = selectedDateString,
+                        date = selectedDate,
                         time = selectedTime,
                         reason = reason,
                         onConfirm = {
                             showDialog = true
                         },
-                        validationMessage = validateAppointmentForm(selectedDateString, selectedTime, reason)
+                        validationMessage = validateAppointmentForm(selectedDate, selectedTime, reason)
                     )
                 } ?: run {
                     // Error: médico no encontrado
@@ -212,7 +202,7 @@ fun AppointmentScreen(
                             // Actualizar cita existente - MODO REPROGRAMAR
                             android.util.Log.d("AppointmentScreen", "UPDATING existing appointment: ${existingAppointment!!.id}")
                             val updatedAppointment = existingAppointment!!.copy(
-                                date = selectedDateString,
+                                date = selectedDate,
                                 time = selectedTime,
                                 reason = reason
                             )
@@ -225,7 +215,7 @@ fun AppointmentScreen(
                                 doctorId = it.id,
                                 doctorName = it.name,
                                 specialty = it.specialty,
-                                date = selectedDateString,
+                                date = selectedDate,
                                 time = selectedTime,
                                 reason = reason,
                                 price = it.price
@@ -241,7 +231,7 @@ fun AppointmentScreen(
                 },
                 onDismiss = { showDialog = false },
                 doctor = doctor,
-                date = selectedDateString,
+                date = selectedDate,
                 time = selectedTime
             )
         }
@@ -268,8 +258,8 @@ fun AppointmentScreen(
         if (showDatePickerDialog) {
             DatePickerDialog(
                 onDismiss = { showDatePickerDialog = false },
-                onConfirm = {
-                    selectedDate = it
+                onConfirm = { confirmedDate ->
+                    selectedDate = confirmedDate
                     showDatePickerDialog = false
                 },
                 datePickerState = datePickerState
@@ -442,6 +432,7 @@ fun DatePickerDialog(
                 onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
                         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                        formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
                         onConfirm(formatter.format(millis))
                     }
                 },

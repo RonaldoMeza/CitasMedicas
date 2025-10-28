@@ -15,10 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.citasmedicas.data.local.DatabaseProvider
+import com.citasmedicas.data.repository.UserRepository
+import com.citasmedicas.model.User
 import com.citasmedicas.ui.theme.*
+import kotlinx.coroutines.launch
 
 /**
  * Pantalla de perfil del usuario
@@ -27,8 +32,22 @@ import com.citasmedicas.ui.theme.*
 fun ProfileScreen(
     onNavigateBack: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
-    onNavigateToNotifications: () -> Unit = {}
+    onNavigateToNotifications: () -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val userRepository = remember { UserRepository(DatabaseProvider.get(context), context) }
+    val scope = rememberCoroutineScope()
+    
+    var currentUser by remember { mutableStateOf<User?>(null) }
+    
+    // Cargar usuario actual
+    LaunchedEffect(Unit) {
+        scope.launch {
+            currentUser = userRepository.getCurrentUser()
+        }
+    }
+    
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -40,13 +59,26 @@ fun ProfileScreen(
         // Información básica
         item {
             ProfileMainCard(
+                user = currentUser,
                 onNavigateToEditProfile = onNavigateToEditProfile
             )
         }
         
         // Información detallada
         item {
-            ProfileDetailsSection()
+            ProfileDetailsSection(user = currentUser)
+        }
+        
+        // Botón cerrar sesión
+        item {
+            LogoutSection(
+                onLogout = {
+                    scope.launch {
+                        userRepository.logout()
+                        onLogout()
+                    }
+                }
+            )
         }
 
         item {
@@ -88,6 +120,7 @@ fun ProfileHeaderSection(onNavigateToNotifications: () -> Unit = {}) {
 
 @Composable
 fun ProfileMainCard(
+    user: User?,
     onNavigateToEditProfile: () -> Unit
 ) {
     Card(
@@ -124,7 +157,7 @@ fun ProfileMainCard(
                 
                 Column {
                     Text(
-                        text = "Yordy Pillaca",
+                        text = user?.name ?: "Usuario",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
@@ -133,7 +166,7 @@ fun ProfileMainCard(
                     Spacer(modifier = Modifier.height(4.dp))
                     
                     Text(
-                        text = "Yordy.Pillaca@tecsup.edu.pe",
+                        text = user?.email ?: "",
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
@@ -164,7 +197,7 @@ fun ProfileMainCard(
 }
 
 @Composable
-fun ProfileDetailsSection() {
+fun ProfileDetailsSection(user: User?) {
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
@@ -173,31 +206,19 @@ fun ProfileDetailsSection() {
                 icon = Icons.Default.Person,
                 iconColor = MediTurnLightBlue,
                 label = "Nombre completo",
-                value = "Yordy Pillaca Ramos"
+                value = user?.name ?: "No especificado"
             ),
             ProfileDetail(
                 icon = Icons.Default.Email,
                 iconColor = MediTurnPurple,
                 label = "Correo electrónico",
-                value = "yordy.pillaca@tecsup.edu.pe"
+                value = user?.email ?: "No especificado"
             ),
             ProfileDetail(
                 icon = Icons.Default.Phone,
                 iconColor = MediTurnLightGreen,
-                label = "Teléfono",
-                value = "+51 985624565"
-            ),
-            ProfileDetail(
-                icon = Icons.Default.LocationOn,
-                iconColor = MediTurnOrange,
-                label = "Dirección",
-                value = "Av. Huarochiri 1687, Santa Anita, Lima"
-            ),
-            ProfileDetail(
-                icon = Icons.Default.DateRange,
-                iconColor = MediTurnPink,
-                label = "Fecha de nacimiento",
-                value = "08/08/2003"
+                label = "ID de Usuario",
+                value = user?.id?.take(8) ?: "N/A"
             )
         )
         
@@ -255,6 +276,30 @@ fun ProfileDetailCard(
                     color = Color.Black
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun LogoutSection(onLogout: () -> Unit) {
+    Column(
+        modifier = Modifier.padding(16.dp)
+    ) {
+        OutlinedButton(
+            onClick = onLogout,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.error
+            ),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Icon(
+                Icons.Default.ExitToApp,
+                contentDescription = "Cerrar sesión",
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Cerrar Sesión")
         }
     }
 }

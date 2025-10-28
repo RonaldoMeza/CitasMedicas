@@ -1,0 +1,10 @@
+package com.citasmedicas.model
+
+/**
+ * Modelo de dominio para Usuario
+ */
+data class User(
+    val id: String,
+    val email: String,
+    val name: String?
+)

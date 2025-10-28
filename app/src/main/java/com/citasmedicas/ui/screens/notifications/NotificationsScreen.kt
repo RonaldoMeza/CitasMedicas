@@ -121,14 +121,7 @@ fun NotificationsScreen(
     selectedAppointment?.let { appointment ->
         AppointmentDetailDialog(
             appointment = appointment,
-            onDismiss = { selectedAppointment = null },
-            onCancel = { 
-                selectedAppointment = null
-            },
-            onEdit = {
-                selectedAppointment = null
-                onNavigateToAppointmentDetail(appointment)
-            }
+            onDismiss = { selectedAppointment = null }
         )
     }
 }
@@ -261,9 +254,7 @@ fun calculateRelativeTime(date: String, time: String): String {
 @Composable
 fun AppointmentDetailDialog(
     appointment: Appointment,
-    onDismiss: () -> Unit,
-    onCancel: () -> Unit,
-    onEdit: () -> Unit
+    onDismiss: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -409,36 +400,15 @@ fun AppointmentDetailDialog(
             }
         },
         confirmButton = {
-            Column {
-                // Botón Reprogramar
-                Button(
-                    onClick = onEdit,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50)
-                    )
-                ) {
-                    Icon(
-                        Icons.Default.Edit,
-                        contentDescription = "Reprogramar",
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Reprogramar Cita")
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // Botón Cerrar
-                OutlinedButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFF2196F3)
-                    )
-                ) {
-                    Text("Cerrar")
-                }
+            // Botón Cerrar
+            Button(
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MediTurnBlue
+                )
+            ) {
+                Text("Cerrar")
             }
         }
     )

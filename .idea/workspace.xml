@@ -10,27 +10,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7de56b19-a477-4903-b8ca-18cabf10ebdb" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gradle/8.13/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/checksums/checksums.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/deviceManager.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deviceManager.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/datasource/AppointmentDataSource.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/datasource/AppointmentDataSource.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/datasource/AppointmentDataSource.kt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/datasource/DoctorDataSource.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/datasource/DoctorDataSource.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/repository/AppointmentRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/repository/AppointmentRepository.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/repository/DoctorRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/repository/DoctorRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Doctor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Doctor.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/data/repository/SlotRepository.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Patient.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/model/Slot.kt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/navigation/AppNavigation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/navigation/AppNavigation.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/navigation/Routes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/navigation/Routes.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/appointment/AppointmentScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/appointment/AppointmentScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/calendar/MyAppointmentsScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/calendar/MyAppointmentsScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/doctor/DoctorDetailScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/doctor/DoctorDetailScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/home/HomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/home/HomeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/notifications/NotificationsScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/notifications/NotificationsScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/profile/ProfileScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/profile/ProfileScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/search/SearchScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/ui/screens/search/SearchScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/util/Constans.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/citasmedicas/util/Constans.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/libs.versions.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +44,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\RNK\.android\avd\Pixel_7.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\RNK\.android\avd\Pixel_9.avd)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -99,6 +103,7 @@
     "cidr.known.project.marker": "true",
     "com.google.services.firebase.aqiPopupShown": "true",
     "git-widget-placeholder": "ronaldo",
+    "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "F:/Program_Languages/Kotlin/AndroidStudio/CitasMedicas/app/src/main/java/com/citasmedicas/ui/screens/profile",
     "project.structure.last.edited": "SDK Location",
     "project.structure.proportion": "0.17",

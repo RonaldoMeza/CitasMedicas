@@ -12,13 +12,16 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.citasmedicas.navigation.AppNavigation
+import com.citasmedicas.navigation.Routes
 import com.citasmedicas.ui.components.MediTurnBottomNavigation
 import com.citasmedicas.ui.theme.CitasMedicasTheme
+import com.citasmedicas.util.AppContextProvider
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        AppContextProvider.init(applicationContext)
         setContent {
             CitasMedicasTheme {
                 MediTurnApp()
@@ -31,28 +34,30 @@ class MainActivity : ComponentActivity() {
 fun MediTurnApp() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: "home"
+    val currentRoute = navBackStackEntry?.destination?.route ?: Routes.Home.route
     
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            MediTurnBottomNavigation(
-                currentRoute = currentRoute,
-                onNavigateToHome = {
-                    navController.navigate("home") {
-                        popUpTo("home") { inclusive = true }
+            if (currentRoute != Routes.Login.route) {
+                MediTurnBottomNavigation(
+                    currentRoute = currentRoute,
+                    onNavigateToHome = {
+                        navController.navigate(Routes.Home.route) {
+                            popUpTo(Routes.Home.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateToSearch = {
+                        navController.navigate(Routes.Search.route)
+                    },
+                    onNavigateToAppointments = {
+                        navController.navigate(Routes.MyAppointments.route)
+                    },
+                    onNavigateToProfile = {
+                        navController.navigate(Routes.Profile.route)
                     }
-                },
-                onNavigateToSearch = {
-                    navController.navigate("search")
-                },
-                onNavigateToAppointments = {
-                    navController.navigate("my_appointments")
-                },
-                onNavigateToProfile = {
-                    navController.navigate("profile")
-                }
-            )
+                )
+            }
         }
     ) { innerPadding ->
         AppNavigation(

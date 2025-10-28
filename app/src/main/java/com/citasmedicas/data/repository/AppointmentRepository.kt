@@ -1,77 +1,82 @@
 package com.citasmedicas.data.repository
 
 import com.citasmedicas.model.Appointment
-import com.citasmedicas.data.datasource.AppointmentDataSource
-import com.citasmedicas.data.datasource.DoctorDataSource
-import java.text.SimpleDateFormat
-import java.util.*
+import com.citasmedicas.data.local.DatabaseProvider
+import com.citasmedicas.util.AppContextProvider
+import com.citasmedicas.util.DateUtils
+import com.citasmedicas.data.session.SessionManager
+import com.citasmedicas.data.mapper.toEntity
+import com.citasmedicas.data.mapper.toModel
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.first
 
 /**
  * Repository para gestionar las citas médicas
  */
-class AppointmentRepository(
-    private val appointmentDataSource: AppointmentDataSource = AppointmentDataSource,
-    private val doctorDataSource: DoctorDataSource = DoctorDataSource()
-) {
+class AppointmentRepository {
+
+    private val context get() = AppContextProvider.context
+    private val db by lazy { DatabaseProvider.get(context) }
+    private val appointmentDao by lazy { db.appointmentDao() }
+    private val session by lazy { SessionManager(context) }
+
+    private fun currentUserId(): String? = runBlocking {
+        session.userIdFlow.first()
+    }
 
     /**
      * Obtener todas las citas del usuario
      */
     fun getAllAppointments(): List<Appointment> {
-        return appointmentDataSource.getAllAppointments()
+        val uid = currentUserId() ?: return emptyList()
+        return appointmentDao.getAllOnce(uid).map { it.toModel() }
     }
 
     /**
      * Obtener citas próximas (futuras)
      */
     fun getUpcomingAppointments(): List<Appointment> {
-        val today = getCurrentDateString()
-        return appointmentDataSource.getAllAppointments().filter {
-            compareDates(it.date, today) >= 0
-        }.sortedBy {
-            "${it.date} ${it.time}"
-        }
+        val uid = currentUserId() ?: return emptyList()
+        val todayIso = DateUtils.todayIso()
+        return appointmentDao.getUpcomingOnce(uid, todayIso).map { it.toModel() }
     }
 
     /**
      * Obtener citas pasadas
      */
     fun getPastAppointments(): List<Appointment> {
-        val today = getCurrentDateString()
-        return appointmentDataSource.getAllAppointments().filter {
-            compareDates(it.date, today) < 0
-        }
+        val uid = currentUserId() ?: return emptyList()
+        val todayIso = DateUtils.todayIso()
+        return appointmentDao.getPastOnce(uid, todayIso).map { it.toModel() }
     }
 
     /**
      * Obtener cita por ID
      */
     fun getAppointmentById(id: String): Appointment? {
-        return appointmentDataSource.getAppointmentById(id)
+        return runBlocking { appointmentDao.getById(id) }?.toModel()
     }
 
     /**
      * Crear una nueva cita
      */
     fun createAppointment(appointment: Appointment): Boolean {
+        val uid = currentUserId() ?: return false
         return try {
-            appointmentDataSource.addAppointment(appointment)
+            runBlocking { appointmentDao.insert(appointment.toEntity(uid)) }
             true
-        } catch (e: Exception) {
-            false
-        }
+        } catch (_: Exception) { false }
     }
 
     /**
      * Actualizar una cita existente
      */
     fun updateAppointment(appointment: Appointment): Boolean {
+        val uid = currentUserId() ?: return false
         return try {
-            appointmentDataSource.updateAppointment(appointment)
+            runBlocking { appointmentDao.update(appointment.toEntity(uid)) }
             true
-        } catch (e: Exception) {
-            false
-        }
+        } catch (_: Exception) { false }
     }
 
     /**
@@ -79,37 +84,9 @@ class AppointmentRepository(
      */
     fun cancelAppointment(appointmentId: String): Boolean {
         return try {
-            appointmentDataSource.removeAppointment(appointmentId)
+            runBlocking { appointmentDao.deleteById(appointmentId) }
             true
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    /**
-     * Obtener la fecha actual en formato DD/MM/YYYY
-     */
-    private fun getCurrentDateString(): String {
-        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        return formatter.format(Date())
-    }
-
-    /**
-     * Comparar dos fechas en formato DD/MM/YYYY
-     * Retorna: negativo si date1 < date2, cero si iguales, positivo si date1 > date2
-     */
-    private fun compareDates(date1: String, date2: String): Int {
-        return try {
-            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            val d1 = formatter.parse(date1)
-            val d2 = formatter.parse(date2)
-            when {
-                d1 != null && d2 != null -> d1.compareTo(d2)
-                else -> 0
-            }
-        } catch (e: Exception) {
-            0
-        }
+        } catch (_: Exception) { false }
     }
 }
 
