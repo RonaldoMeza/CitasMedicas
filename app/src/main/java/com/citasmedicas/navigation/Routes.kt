@@ -4,6 +4,7 @@ package com.citasmedicas.navigation
  * Rutas de navegación MediTurn
  */
 sealed class Routes(val route: String) {
+    object Login : Routes("login")
     object Home : Routes("home")
     object Search : Routes("search") {
         fun createRoute(searchQuery: String? = null) =
@@ -27,6 +28,7 @@ sealed class Routes(val route: String) {
  * Rutas principales
  */
 object AppRoutes {
+    const val LOGIN = "login"
     const val HOME = "home"
     const val SEARCH = "search"
     const val DOCTOR_DETAIL = "doctor_detail"

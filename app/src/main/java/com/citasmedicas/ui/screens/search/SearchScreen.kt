@@ -37,23 +37,51 @@ fun SearchScreen(
     val repository = remember { DoctorRepository() }
     var searchQuery by remember { mutableStateOf(initialSearchQuery ?: "") }
     var doctors by remember { mutableStateOf(repository.getAllDoctors()) }
-    var showTelemedicineFilter by remember { mutableStateOf(false) }
+    
+    // Estados de filtros
+    var selectedSpecialty by remember { mutableStateOf<String?>(null) }
+    var selectedCity by remember { mutableStateOf<String?>(null) }
+    var showTelemedicineOnly by remember { mutableStateOf(false) }
+    
+    // Listas de opciones para filtros
+    val specialties = listOf(
+        "Cardiología", "Neurología", "Traumatología", 
+        "Oftalmología", "Pediatría", "Medicina General", "Dermatología"
+    )
+    val cities = listOf(
+        "Lima", "Arequipa", "Cusco", "Trujillo"
+    )
 
     // Filtrar médicos según búsqueda y filtros
-    LaunchedEffect(searchQuery, showTelemedicineFilter) {
+    LaunchedEffect(searchQuery, selectedSpecialty, selectedCity, showTelemedicineOnly) {
         var filteredDoctors = repository.getAllDoctors()
         
-        // Filtro por teleconsulta
-        if (showTelemedicineFilter) {
-            filteredDoctors = repository.getDoctorsWithTelemedicine()
-        }
-        
-        // Filtro por búsqueda
+        // Filtro por búsqueda general
         if (searchQuery.isNotBlank()) {
             filteredDoctors = filteredDoctors.filter { doctor ->
                 doctor.name.contains(searchQuery, ignoreCase = true) ||
-                doctor.specialty.contains(searchQuery, ignoreCase = true)
+                doctor.specialty.contains(searchQuery, ignoreCase = true) ||
+                doctor.location.contains(searchQuery, ignoreCase = true)
             }
+        }
+        
+        // Filtro por especialidad
+        if (selectedSpecialty != null) {
+            filteredDoctors = filteredDoctors.filter { doctor ->
+                doctor.specialty.equals(selectedSpecialty, ignoreCase = true)
+            }
+        }
+        
+        // Filtro por ciudad/ubicación
+        if (selectedCity != null) {
+            filteredDoctors = filteredDoctors.filter { doctor ->
+                doctor.location.contains(selectedCity!!, ignoreCase = true)
+            }
+        }
+        
+        // Filtro por teleconsulta
+        if (showTelemedicineOnly) {
+            filteredDoctors = filteredDoctors.filter { it.supportsTelemedicine }
         }
         
         doctors = filteredDoctors
@@ -118,11 +146,101 @@ fun SearchScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Filtros
-            FilterChipsRow(
-                showTelemedicine = showTelemedicineFilter,
-                onTelemedicineFilterChanged = { showTelemedicineFilter = it }
+            // Filtros por especialidad
+            Text(
+                text = "Especialidad",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorScheme.onSurface
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                item {
+                    FilterChip(
+                        selected = selectedSpecialty == null,
+                        onClick = { selectedSpecialty = null },
+                        label = { Text("Todas") },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MediTurnBlue,
+                            selectedLabelColor = Color.White
+                        )
+                    )
+                }
+                items(specialties) { specialty ->
+                    FilterChip(
+                        selected = selectedSpecialty == specialty,
+                        onClick = { selectedSpecialty = if (selectedSpecialty == specialty) null else specialty },
+                        label = { Text(specialty) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MediTurnBlue,
+                            selectedLabelColor = Color.White
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Filtros por ciudad
+            Text(
+                text = "Ciudad",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                item {
+                    FilterChip(
+                        selected = selectedCity == null,
+                        onClick = { selectedCity = null },
+                        label = { Text("Todas") },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MediTurnBlue,
+                            selectedLabelColor = Color.White
+                        )
+                    )
+                }
+                items(cities) { city ->
+                    FilterChip(
+                        selected = selectedCity == city,
+                        onClick = { selectedCity = if (selectedCity == city) null else city },
+                        label = { Text(city, fontSize = 12.sp) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MediTurnBlue,
+                            selectedLabelColor = Color.White
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Filtro de teleconsulta
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Solo teleconsulta",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
+                Switch(
+                    checked = showTelemedicineOnly,
+                    onCheckedChange = { showTelemedicineOnly = it },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = MediTurnBlue
+                    )
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 

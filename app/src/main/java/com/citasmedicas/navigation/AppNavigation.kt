@@ -1,7 +1,11 @@
 package com.citasmedicas.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,6 +19,9 @@ import com.citasmedicas.ui.screens.notifications.NotificationsScreen
 import com.citasmedicas.model.Appointment
 import com.citasmedicas.data.repository.AppointmentRepository
 import android.util.Log
+import com.citasmedicas.data.local.DatabaseProvider
+import com.citasmedicas.data.session.SessionManager
+import com.citasmedicas.ui.screens.auth.LoginScreen
 
 
 /**
@@ -27,11 +34,25 @@ fun AppNavigation(
 ) {
     val appointmentRepository = AppointmentRepository()
 
+    // Inicializar BD y sesión
+    val context = LocalContext.current
+    remember { DatabaseProvider.get(context) }
+
     NavHost(
         navController = navController,
-        startDestination = Routes.Home.route,
+        startDestination = Routes.Login.route,
         modifier = modifier
     ) {
+        // Login
+        composable(Routes.Login.route) {
+            LoginScreen(
+                onLoggedIn = {
+                    navController.navigate(Routes.Home.route) {
+                        popUpTo(Routes.Login.route) { inclusive = true }
+                    }
+                }
+            )
+        }
         // Pantalla principal
         composable(Routes.Home.route) {
             HomeScreen(
@@ -142,16 +163,15 @@ fun AppNavigation(
                     Log.d("AppNavigation", "Showing appointment detail: ${appointment.id}")
                 },
                 onNavigateToAppointment = { identifier ->
-                    // El identificador puede ser un appointmentId o un doctorId
-                    if (identifier.startsWith("appointment_")) {
-                        // Es un ID de cita - buscar la cita para obtener el doctorId
-                        val appointment = appointmentRepository.getAppointmentById(identifier)
-                        appointment?.let {
-                            Log.d("AppNavigation", "Reprogramming appointment: ${it.id} for doctor: ${it.doctorId}")
-                            navController.navigate(Routes.Appointment.createRoute(it.doctorId, it.id))
-                        }
+                    // Intentar primero buscar como appointmentId
+                    val appointment = appointmentRepository.getAppointmentById(identifier)
+                    if (appointment != null) {
+                        // Es un appointmentId - reprogramar cita existente
+                        Log.d("AppNavigation", "Reprogramming appointment: ${appointment.id} for doctor: ${appointment.doctorId}")
+                        navController.navigate(Routes.Appointment.createRoute(appointment.doctorId, appointment.id))
                     } else {
-                        // Es un doctorId directamente
+                        // Es un doctorId - crear nueva cita
+                        Log.d("AppNavigation", "Creating new appointment for doctor: $identifier")
                         navController.navigate(Routes.Appointment.createRoute(identifier))
                     }
                 },
@@ -209,6 +229,11 @@ fun AppNavigation(
                 },
                 onNavigateToNotifications = {
                     navController.navigate(Routes.Notifications.route)
+                },
+                onLogout = {
+                    navController.navigate(Routes.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             )
         }

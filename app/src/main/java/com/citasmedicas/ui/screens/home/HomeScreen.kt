@@ -23,8 +23,13 @@ import com.citasmedicas.ui.theme.*
 import com.citasmedicas.ui.components.NotificationIcon
 import com.citasmedicas.ui.components.getUnreadNotificationCount
 import com.citasmedicas.data.repository.DoctorRepository
+import com.citasmedicas.data.repository.UserRepository
+import com.citasmedicas.data.local.DatabaseProvider
 import com.citasmedicas.model.Doctor
+import com.citasmedicas.model.User
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 
 /**
  * Pantalla principal de MediTurn - Diseño Figma
@@ -37,10 +42,22 @@ fun HomeScreen(
     onNavigateToAppointment: (String) -> Unit = {},
     onNavigateToNotifications: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     val doctorRepository = remember { DoctorRepository() }
+    val userRepository = remember { UserRepository(DatabaseProvider.get(context), context) }
+    val scope = rememberCoroutineScope()
+    
+    var currentUser by remember { mutableStateOf<User?>(null) }
     var searchQuery by remember { mutableStateOf("") }
     var searchResults by remember { mutableStateOf<List<Doctor>>(emptyList()) }
     var isSearching by remember { mutableStateOf(false) }
+    
+    // Cargar usuario actual
+    LaunchedEffect(Unit) {
+        scope.launch {
+            currentUser = userRepository.getCurrentUser()
+        }
+    }
 
     // Realizar búsqueda cuando cambia el texto
     LaunchedEffect(searchQuery) {
@@ -59,6 +76,7 @@ fun HomeScreen(
         // Header con búsqueda
         item {
             HeaderSection(
+                userName = currentUser?.name ?: "Usuario",
                 onNavigateToProfile = onNavigateToProfile,
                 onNavigateToSearch = onNavigateToSearch,
                 onNavigateToNotifications = onNavigateToNotifications,
@@ -103,6 +121,7 @@ fun HomeScreen(
 
 @Composable
 fun HeaderSection(
+    userName: String,
     onNavigateToProfile: () -> Unit,
     onNavigateToSearch: (String?) -> Unit,
     onNavigateToNotifications: () -> Unit,
@@ -120,7 +139,7 @@ fun HeaderSection(
         Column {
             // Bienvenida
             Text(
-                text = "Hola, Yordy",
+                text = "Hola, $userName",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
