@@ -26,8 +26,10 @@ fun MediTurnBottomNavigation(
     onNavigateToAppointments: () -> Unit,
     onNavigateToProfile: () -> Unit
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    
     NavigationBar(
-        containerColor = Color.White,
+        containerColor = colorScheme.surface,
         modifier = Modifier.fillMaxWidth()
     ) {
         val navItems = listOf(
@@ -43,7 +45,7 @@ fun MediTurnBottomNavigation(
                     Icon(
                         imageVector = item.icon,
                         contentDescription = item.label,
-                        tint = if (currentRoute == item.route) MediTurnBlue else Color.Gray
+                        tint = if (currentRoute == item.route) MediTurnBlue else colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 },
                 label = {
@@ -51,7 +53,7 @@ fun MediTurnBottomNavigation(
                         text = item.label,
                         fontSize = 12.sp,
                         fontWeight = if (currentRoute == item.route) FontWeight.Bold else FontWeight.Normal,
-                        color = if (currentRoute == item.route) MediTurnBlue else Color.Gray
+                        color = if (currentRoute == item.route) MediTurnBlue else colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 },
                 selected = currentRoute == item.route,
@@ -66,8 +68,8 @@ fun MediTurnBottomNavigation(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MediTurnBlue,
                     selectedTextColor = MediTurnBlue,
-                    unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray,
+                    unselectedIconColor = colorScheme.onSurface.copy(alpha = 0.6f),
+                    unselectedTextColor = colorScheme.onSurface.copy(alpha = 0.6f),
                     indicatorColor = MediTurnBlue.copy(alpha = 0.1f)
                 )
             )

@@ -22,6 +22,8 @@ import android.util.Log
 import com.citasmedicas.data.repository.DoctorRepository
 import com.citasmedicas.model.Doctor
 import com.citasmedicas.ui.theme.*
+import com.citasmedicas.util.isCompactWidth
+import com.citasmedicas.util.getColumnCount
 
 /**
  * Pantalla de búsqueda de médicos
@@ -253,7 +255,7 @@ fun SearchScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Lista de médicos
+            // Lista de médicos con layout responsivo
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {

@@ -21,6 +21,7 @@ sealed class Routes(val route: String) {
     }
     object MyAppointments : Routes("my_appointments")
     object Profile : Routes("profile")
+    object EditProfile : Routes("edit_profile")
     object Notifications : Routes("notifications")
 }
 

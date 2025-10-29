@@ -14,7 +14,7 @@ import com.citasmedicas.data.local.entity.*
         AppointmentEntity::class,
         ReminderEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
