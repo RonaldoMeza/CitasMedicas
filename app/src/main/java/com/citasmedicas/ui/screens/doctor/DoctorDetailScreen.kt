@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import android.util.Log
-import com.citasmedicas.data.datasource.DoctorDataSource
+import com.citasmedicas.data.repository.DoctorRepository
 import com.citasmedicas.model.Doctor
 import com.citasmedicas.ui.theme.*
 
@@ -34,7 +34,7 @@ fun DoctorDetailScreen(
     onNavigateBack: () -> Unit,
     onNavigateToAppointment: (String) -> Unit
 ) {
-    val dataSource = remember { DoctorDataSource() }
+    val repository = remember { DoctorRepository() }
 
 
     var doctor by remember { mutableStateOf<Doctor?>(null) }
@@ -46,7 +46,7 @@ fun DoctorDetailScreen(
             Log.d("DoctorDetail", "Buscando médico con ID: '$doctorId'")
             isLoading = true
             errorMessage = null
-            doctor = dataSource.getDoctorById(doctorId)
+            doctor = repository.getDoctorById(doctorId)
             if (doctor == null) {
                 Log.e("DoctorDetail", "Médico no encontrado con ID: '$doctorId'")
                 errorMessage = "Médico con ID: $doctorId no encontrado"

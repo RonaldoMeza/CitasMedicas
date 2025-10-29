@@ -6,5 +6,8 @@ import com.citasmedicas.model.User
 fun UserEntity.toModel() = User(
     id = id,
     email = email,
-    name = name
+    name = name,
+    phone = phone,
+    address = address,
+    birthDate = birthDate
 )

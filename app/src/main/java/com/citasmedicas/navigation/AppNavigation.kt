@@ -225,7 +225,7 @@ fun AppNavigation(
                     navController.popBackStack()
                 },
                 onNavigateToEditProfile = {
-                    // Navegación a editar perfil (por implementar)
+                    navController.navigate(Routes.EditProfile.route)
                 },
                 onNavigateToNotifications = {
                     navController.navigate(Routes.Notifications.route)
@@ -234,6 +234,18 @@ fun AppNavigation(
                     navController.navigate(Routes.Login.route) {
                         popUpTo(0) { inclusive = true }
                     }
+                }
+            )
+        }
+
+        // Pantalla de editar perfil
+        composable(Routes.EditProfile.route) {
+            com.citasmedicas.ui.screens.profile.EditProfileScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onProfileUpdated = {
+                    navController.popBackStack()
                 }
             )
         }

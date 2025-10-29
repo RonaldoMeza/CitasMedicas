@@ -42,6 +42,30 @@ class UserRepository(private val db: AppDatabase, private val context: Context) 
         return userDao.getById(userId)?.toModel()
     }
 
+    suspend fun updateUser(
+        name: String?,
+        phone: String?,
+        address: String?,
+        birthDate: String?
+    ): Result<Unit> {
+        val userId = session.userIdFlow.first() ?: return Result.failure(IllegalStateException("Usuario no autenticado"))
+        val existingUser = userDao.getById(userId) ?: return Result.failure(IllegalStateException("Usuario no encontrado"))
+        
+        val updatedUser = existingUser.copy(
+            name = name?.takeIf { it.isNotBlank() },
+            phone = phone?.takeIf { it.isNotBlank() },
+            address = address?.takeIf { it.isNotBlank() },
+            birthDate = birthDate?.takeIf { it.isNotBlank() }
+        )
+        
+        return try {
+            userDao.update(updatedUser)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun logout() {
         session.clear()
     }

@@ -40,9 +40,10 @@ fun ProfileScreen(
     val scope = rememberCoroutineScope()
     
     var currentUser by remember { mutableStateOf<User?>(null) }
+    var refreshKey by remember { mutableIntStateOf(0) }
     
     // Cargar usuario actual
-    LaunchedEffect(Unit) {
+    LaunchedEffect(refreshKey) {
         scope.launch {
             currentUser = userRepository.getCurrentUser()
         }
@@ -217,8 +218,20 @@ fun ProfileDetailsSection(user: User?) {
             ProfileDetail(
                 icon = Icons.Default.Phone,
                 iconColor = MediTurnLightGreen,
-                label = "ID de Usuario",
-                value = user?.id?.take(8) ?: "N/A"
+                label = "Teléfono",
+                value = user?.phone ?: "No especificado"
+            ),
+            ProfileDetail(
+                icon = Icons.Default.LocationOn,
+                iconColor = MediTurnOrange,
+                label = "Dirección",
+                value = user?.address ?: "No especificado"
+            ),
+            ProfileDetail(
+                icon = Icons.Default.DateRange,
+                iconColor = MediTurnPink,
+                label = "Fecha de nacimiento",
+                value = user?.birthDate ?: "No especificado"
             )
         )
         
